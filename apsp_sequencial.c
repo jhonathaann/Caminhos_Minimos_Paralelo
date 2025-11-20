@@ -116,13 +116,16 @@ void liberar_matriz(int **matriz, int n) {
  *   - g: grafo de entrada
  * Retorno: matriz de distancia minimas
  */
-int **floyd_warshall(Grafo *g) {
+int **floyd_warshall(Grafo *g, double *tempo_execucao) {
     int n = g->n;
 
     // cria uma copia da matriz de adj
     int **dist = copiar_matriz(g->adj, n);
 
-    printf("\nececutando algoritmo Floyd-Warshall...\n");
+    printf("\nExecutando algoritmo Floyd-Warshall...\n");
+
+    // inicia a medição do tempo
+    clock_t inicio = clock();
 
     // loop principal: k é o vertice intermediario
     for (int k = 0; k < n; k++) {
@@ -139,6 +142,12 @@ int **floyd_warshall(Grafo *g) {
             }
         }
     }
+
+    // finaliza a medição do tempo
+    clock_t fim = clock();
+
+    // calcula o tempo em segundos
+    *tempo_execucao = ((double)(fim - inicio)) / CLOCKS_PER_SEC;
 
     printf("Floyd-Warshall concluido!\n");
     return dist;
@@ -163,18 +172,23 @@ int main(int argc, char *argv[]) {
     // printf("\n=== Matriz de Adjacência (Grafo de Entrada) ===\n");
     // imprimir_grafo(g->adj, g->n);
 
-    // executa o algoritmo de floyd_warshall
-    int **distancias = floyd_warshall(g);
+    // Executar o algoritmo Floyd-Warshall e medir o tempo
+    double tempo_execucao = 0.0;
+    int **distancias = floyd_warshall(g, &tempo_execucao);
+
+    printf("\n=== RESULTADOS ===\n");
+    printf("Número de vértices: %d\n", g->n);
+    printf("Tempo de execução do Floyd-Warshall: %.6f segundos\n",tempo_execucao);
 
     // salva o resultado se foi fornecido arquivo de saida
     if (argc >= 3) {
         salva_matriz_distancias(distancias, g->n, argv[2]);
-        printf("Matriz de distancias salva em: %s\n", argv[2]);
+        printf("\nMatriz de distancias salva em: %s\n", argv[2]);
     }
 
     liberar_matriz(distancias, g->n);
     liberar_grafo(g);
 
-    printf("Programa finalizado com sucesso!\n");
+    printf("\nPrograma finalizado com sucesso!\n");
     return 0;
 }
