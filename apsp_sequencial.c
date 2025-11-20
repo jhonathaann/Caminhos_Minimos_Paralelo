@@ -166,9 +166,11 @@ int main(int argc, char *argv[]) {
     // executa o algoritmo de floyd_warshall
     int **distancias = floyd_warshall(g);
 
-    // imprimir_grafo(distancias, g->n);
-    salva_matriz_distancias(distancias, g->n, argv[2]);
-
+    // salva o resultado se foi fornecido arquivo de saida
+    if (argc >= 3) {
+        salva_matriz_distancias(distancias, g->n, argv[2]);
+        printf("Matriz de distancias salva em: %s\n", argv[2]);
+    }
 
     liberar_matriz(distancias, g->n);
     liberar_grafo(g);
