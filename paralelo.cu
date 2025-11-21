@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <limits.h>
-// #include <cuda_runtime.h>
+#include <cuda_runtime.h>
 
 #define INF INT_MAX
 
@@ -79,6 +79,48 @@ int *matriz_para_vetor(int **matriz, int n){
     }
 
     return vetor;
+}
+
+/* KERNEL CUDA que executa na CPU
+
+este codigo sera executado em PARALELO na GPU
+
+__global__ = funcao que roda na GPU e é chamada pela CPU
+
+- para cada vertice intermediario k, lançamos milhares de threads
+- cada uma dessas threads calcula uma PAR (i, j)
+- todas as threads trabalham ao mesmo tempo
+
+parametros:
+- dist: matriz de distancias (na forma linear)
+- n: numero de vertices
+- k: vertice intermediario atual
+*/
+
+__global__ void floyd_warshall_kernel(int *dist, int n, int k){
+
+    // calcula o indide (i, j) dessa thread
+    // blockIdx e threadIdx são variáveis automáticas do CUDA
+    int i = blockIdx.y * blockDim.y + threadIdx.y;
+    int j = blockIdx.x * blockDim.x + threadIdx.x;
+
+    // verifica se estamos no limite da matriz
+    if(i < n && j < n){
+        // acessa os elementos: matriz[i][j] = vetor[i * n + j]
+        int ik = dist[i * n + k]; // distancia i -> k
+        int kj = dist[k * n + j]; // distancia k -> j
+        int ij = dist[i * n + j]; // distancia i -> j
+
+        // evita se dar ruim somando dois numeros muito grandes
+        if(ik != INF && kj != INF){
+            int novo_caminho = ik + kj;
+
+            // se esse novo caminho é melhor: atualiza
+            if(novo_caminho < ij){
+                dist[i * n + j] = novo_caminho;
+            }
+        }
+    }
 }
 
 int main(int argc, char *argv[]){
