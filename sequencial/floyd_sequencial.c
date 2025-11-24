@@ -6,50 +6,73 @@
 #define INF INT_MAX
 
 // struct que representa o Grafo
-typedef struct {
-  int n;     // numero de vertices
-  int **adj; // matriz de adjacencia
+typedef struct
+{
+    int n;     // numero de vertices
+    int **adj; // matriz de adjacencia
 } Grafo;
 
 // aloca o grafo e retorna o ponteiro para o grafo criado
-Grafo *criar_grafo(int n) {
+Grafo *criar_grafo(int n)
+{
     Grafo *g = (Grafo *)malloc(sizeof(Grafo));
     g->n = n;
     // aloca a matriz de adjc
     g->adj = (int **)malloc(n * sizeof(int *));
-    for (int i = 0; i < n; i++) {
+    for (int i = 0; i < n; i++)
+    {
         g->adj[i] = (int *)malloc(n * sizeof(int));
     }
 
     return g;
 }
 
-void liberar_grafo(Grafo *g) {
-    for (int i = 0; i < g->n; i++) {
+void liberar_grafo(Grafo *g)
+{
+    for (int i = 0; i < g->n; i++)
+    {
         free(g->adj[i]);
     }
     free(g->adj);
     free(g);
 }
 
-Grafo *ler_grafo(const char *nome_arquivo) {
+Grafo *ler_grafo(const char *nome_arquivo)
+{
     FILE *arquivo = fopen(nome_arquivo, "r");
 
     int n;
-    fscanf(arquivo, "%d", &n);
+
+    if (fscanf(arquivo, "%d", &n) != 1)
+    {
+        fprintf(stderr, "Error: Failed to read the number of vertices (n).\n");
+        fclose(arquivo);
+        exit(EXIT_FAILURE); // or return an error code
+    }
 
     printf("Lendo grafo com %d vertices...\n", n);
     Grafo *g = criar_grafo(n);
 
-    for(int i = 0; i < n; i++){
-        for(int j = 0; j < n; j++){
+    for (int i = 0; i < n; i++)
+    {
+        for (int j = 0; j < n; j++)
+        {
             char buffer[64]; // buffer para ler a linha
-            fscanf(arquivo, "%s", buffer);
+
+            if (fscanf(arquivo, "%s", buffer) != 1)
+            {
+                fprintf(stderr, "Error: Failed to read the number of vertices (n).\n");
+                fclose(arquivo);
+                exit(EXIT_FAILURE); // or return an error code
+            }
 
             // verifica se é INF
-            if(buffer[0] == 'I' || buffer[0] == 'i'){
+            if (buffer[0] == 'I' || buffer[0] == 'i')
+            {
                 g->adj[i][j] = INF;
-            }else{
+            }
+            else
+            {
                 g->adj[i][j] = atoi(buffer);
             }
         }
@@ -60,11 +83,14 @@ Grafo *ler_grafo(const char *nome_arquivo) {
     return g;
 }
 
-void salva_matriz_distancias(int **matriz, int n, const char *nome_arquivo){
+void salva_matriz_distancias(int **matriz, int n, const char *nome_arquivo)
+{
     FILE *arquivo = fopen(nome_arquivo, "w");
 
-    for(int i = 0; i < n; i++){
-        for(int j = 0; j < n; j++){
+    for (int i = 0; i < n; i++)
+    {
+        for (int j = 0; j < n; j++)
+        {
             fprintf(arquivo, "%d ", matriz[i][j]);
         }
         fprintf(arquivo, "\n");
@@ -73,12 +99,18 @@ void salva_matriz_distancias(int **matriz, int n, const char *nome_arquivo){
     fclose(arquivo);
 }
 
-void imprimir_grafo(int **matriz, int n) {
-    for (int i = 0; i < n; i++) {
-        for (int j = 0; j < n; j++) {
-            if (matriz[i][j] == INF) {
+void imprimir_grafo(int **matriz, int n)
+{
+    for (int i = 0; i < n; i++)
+    {
+        for (int j = 0; j < n; j++)
+        {
+            if (matriz[i][j] == INF)
+            {
                 printf("  INF");
-            } else {
+            }
+            else
+            {
                 printf("%5d", matriz[i][j]);
             }
         }
@@ -87,19 +119,24 @@ void imprimir_grafo(int **matriz, int n) {
     printf("\n");
 }
 
-int **copiar_matriz(int **origem, int n) {
+int **copiar_matriz(int **origem, int n)
+{
     int **copia = (int **)malloc(n * sizeof(int *));
-    for (int i = 0; i < n; i++) {
+    for (int i = 0; i < n; i++)
+    {
         copia[i] = (int *)malloc(n * sizeof(int));
-        for (int j = 0; j < n; j++) {
-        copia[i][j] = origem[i][j];
+        for (int j = 0; j < n; j++)
+        {
+            copia[i][j] = origem[i][j];
         }
     }
     return copia;
 }
 
-void liberar_matriz(int **matriz, int n) {
-    for (int i = 0; i < n; i++) {
+void liberar_matriz(int **matriz, int n)
+{
+    for (int i = 0; i < n; i++)
+    {
         free(matriz[i]);
     }
     free(matriz);
@@ -116,7 +153,8 @@ void liberar_matriz(int **matriz, int n) {
  *   - g: grafo de entrada
  * Retorno: matriz de distancia minimas
  */
-int **floyd_warshall(Grafo *g, double *tempo_execucao) {
+int **floyd_warshall(Grafo *g, double *tempo_execucao)
+{
     int n = g->n;
 
     // cria uma copia da matriz de adj
@@ -128,14 +166,19 @@ int **floyd_warshall(Grafo *g, double *tempo_execucao) {
     clock_t inicio = clock();
 
     // loop principal: k é o vertice intermediario
-    for (int k = 0; k < n; k++) {
+    for (int k = 0; k < n; k++)
+    {
         // para cada par de vertices (i, j)
-        for (int i = 0; i < n; i++) {
-            for (int j = 0; j < n; j++) {
+        for (int i = 0; i < n; i++)
+        {
+            for (int j = 0; j < n; j++)
+            {
                 // so vamos realizar a soma se ambas as entradas forem != de INF (sera que é melhor um OU?)
-                if (dist[i][k] != INF && dist[k][j] != INF) {
+                if (dist[i][k] != INF && dist[k][j] != INF)
+                {
                     // se o caminho i->k->j é menor que i->j
-                    if (dist[i][k] + dist[k][j] < dist[i][j]) {
+                    if (dist[i][k] + dist[k][j] < dist[i][j])
+                    {
                         dist[i][j] = dist[i][k] + dist[k][j];
                     }
                 }
@@ -153,11 +196,13 @@ int **floyd_warshall(Grafo *g, double *tempo_execucao) {
     return dist;
 }
 
-int main(int argc, char *argv[]) {
+int main(int argc, char *argv[])
+{
     printf("=== APSP - Versão Sequencial ===\n\n");
 
     // Verificar argumentos da linha de comando
-    if (argc < 2) {
+    if (argc < 2)
+    {
         printf("Uso: %s <arquivo_grafo>\n", argv[0]);
         printf("Exemplo: %s grafo.txt\n", argv[0]);
         return 1;
@@ -165,7 +210,8 @@ int main(int argc, char *argv[]) {
 
     // Ler o grafo do arquivo
     Grafo *g = ler_grafo(argv[1]);
-    if (g == NULL) {
+    if (g == NULL)
+    {
         return 1;
     }
 
@@ -178,10 +224,11 @@ int main(int argc, char *argv[]) {
 
     printf("\n=== RESULTADOS ===\n");
     printf("Número de vértices: %d\n", g->n);
-    printf("Tempo de execução do Floyd-Warshall: %.6f segundos\n",tempo_execucao);
+    printf("Tempo de execução do Floyd-Warshall: %.6f segundos\n", tempo_execucao);
 
     // salva o resultado se foi fornecido arquivo de saida
-    if (argc >= 3) {
+    if (argc >= 3)
+    {
         salva_matriz_distancias(distancias, g->n, argv[2]);
         printf("\nMatriz de distancias salva em: %s\n", argv[2]);
     }

@@ -3,6 +3,9 @@
 #### COMPILA: 
     gcc -o floyd_sequencial sequencial/floyd_sequencial.c -Wall
 
+#### COMPILA COM OTIMIZAÇÃO: 
+    gcc -o floyd_sequencial sequencial/floyd_sequencial.c -O3 -Wall
+
 #### EXECUTA:
     ./floyd_sequencial input/arquivo_entrada.txt output/arquivo_saida.txt
 
