@@ -146,7 +146,7 @@ __global__ void floyd_warshall_kernel(int *dist, int n, int k)
         // evita se dar ruim somando dois numeros muito grandes
         if (ik != INF && kj != INF)
         {
-            int novo_caminho = ik + kj;
+            long long novo_caminho = ik + kj;
 
             // se esse novo caminho é melhor: atualiza
             if (novo_caminho < ij)
