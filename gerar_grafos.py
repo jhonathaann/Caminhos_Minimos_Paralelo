@@ -86,7 +86,7 @@ def gerar_grafo_customizado():
 
 def main():
     random.seed(42)
-    gerar_grafo_customizado
+    gerar_grafo_customizado()
 
 if __name__ == "__main__":
     main()
